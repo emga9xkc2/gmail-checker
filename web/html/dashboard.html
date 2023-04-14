@@ -158,13 +158,13 @@
                 placeholder="Logs"></textarea>
         </div>
     </div>
-    <div class="w3-bar-item w3-white lang" id="numsuccess" style="width:100%">...</div>
+    <div class="lang" id="numsuccess" style="width:100%; line-height: 2;">...</div>
 
 
-    <br>
+
 
     <div style="float: left;">
-        <p id="user" style="display:inline;"></p><button class="settingcss"
+        <p id="user" style="display:inline; line-height: 2.5;"></p><button class="settingcss"
             style="display:inline; background-color:DodgerBlue" id="activeaccount" title="Kích hoạt tài khoản"><i
                 class="fa fa-user-circle"></i></button>
 
@@ -517,7 +517,7 @@
                 $("#user").css("color", "red")
                 return
             }
-            setHtmlCssSelector("#user", "Hi: " + hoten + ". " + "Expired: " + date)
+            setHtmlCssSelector("#user", "Hi: " + hoten + ". " + "Expire: " + date)
             $("#user").css("color", "green")
 
             // console.log(date)
