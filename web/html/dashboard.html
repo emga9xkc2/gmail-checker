@@ -39,6 +39,57 @@
     .btn:hover {
         background-color: RoyalBlue;
     }
+
+
+
+    #dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+    }
+
+    .dialog-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+    }
+
+    .dialog-container h3 {
+        margin-top: 0;
+    }
+
+    #name-input {
+        display: block;
+        margin-bottom: 10px;
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    #submit-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 3px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    #submit-button:hover {
+        background-color: #3e8e41;
+    }
 </style>
 
 <div id="id01" class="w3-modal">
@@ -98,51 +149,41 @@
 
 
     <!-- <button onclick="updateMails()" class="w3-button w3-teal w3-right">Cập nhật danh sách mail</button> -->
-    <div id="main">
-        <br>
-        <br>
-        <div class="tab_log">
-            <div class="w3-row">
-                <textarea id="nhatkyhoatdong" rows="15" style="width: 100%; resize: none;border: 1px solid #ccc;"
-                    placeholder="Logs"></textarea>
-            </div>
+
+    <br>
+    <br>
+    <div class="tab_log">
+        <div class="w3-row">
+            <textarea id="nhatkyhoatdong" rows="15" style="width: 100%; resize: none;border: 1px solid #ccc;"
+                placeholder="Logs"></textarea>
         </div>
-        <div class="w3-bar-item w3-white lang" id="numsuccess" style="width:100%">...</div>
+    </div>
+    <div class="w3-bar-item w3-white lang" id="numsuccess" style="width:100%">...</div>
 
 
-        <div class="tab_account">
-            <div class="w3-row">
+    <br>
 
-                <div class="w3-threequarter"><input class="w3-input w3-animate-input" name="textsetting" type="text"
-                        id="apikeyactive" placeholder="Active account"></div>
-                <button onclick="kichHoatTaiKhoan()" class="w3-button w3-green w3-right">Active account</button>
-                <br>
-                <br>
-                <br>
-
-            </div>
-            <div class="w3-row">
-                <div class="w3-half">
-                    <input type="text" id="user" style="width: 100%; border: none;">
-                </div>
-
-
-
-            </div>
-
-
-        </div>
+    <div style="float: left;">
+        <p id="user" style="display:inline;"></p><button class="settingcss"
+            style="display:inline; background-color:DodgerBlue" id="activeaccount" title="Kích hoạt tài khoản"><i
+                class="fa fa-user-circle"></i></button>
 
     </div>
 
 
-    <div class="cung1hang">
-        <p class="w3-white lang" id="version" style="width:100%; display:inline;  line-height: 2.2;">...</p>
+
+
+    <div style="float: right;">
+        <p id="version" style="display:inline;">...
+        </p>
         <button class="settingcss" style="color: rgb(212, 255, 0); display:inline;" id="updateversion"
             title="Cập nhật phiên bản mới"><i class="fa fa-download"></i></button>
-        <button class="settingcss" style="display:inline; background-color:DodgerBlue" id="updateversion"
-            title="Kích hoạt tài khoản"><i class="fa fa-user-circle"></i></button>
     </div>
+
+
+
+
+
 
 
 
@@ -154,6 +195,7 @@
 
 
 <script>
+    var apikeyactive = "apikeyactive"
 
     function checkVersionInfo() {
         // $("#updateversion").hide();
@@ -290,6 +332,23 @@
         }
         )
     });
+    $("#activeaccount").bind("click", function () {
+        showDialog({
+            title: "Nhập key để kích hoạt phần mềm",
+            value: localStorage.getItem(apikeyactive),
+        }).then(function (value) {
+            if (value === "") {
+                return
+            }
+
+            eel.kichHoatTaiKhoan(value)(function (callback) {
+                eel.updateSetting(apikeyactive, value)
+                localStorage.setItem(apikeyactive, value)
+                var mess = callback.mess
+                toastWarning(mess)
+            })
+        })
+    });
     $("#optionproxy").change(function () {
         addSetting(this.id, this.value)
     });
@@ -387,8 +446,8 @@
         // $("#changelanguage").prop("checked", strToBool(hconfig.changelanguage));
         // $("#verifyphone").prop("checked", strToBool(hconfig.verifyphone));
         // $("#restoredisable").prop("checked", strToBool(hconfig.restoredisable));
+        localStorage.setItem(apikeyactive, hconfig.apikeyactive)
 
-        $("#apikeyactive").val(hconfig.apikeyactive);
         if (setlang == "vi") {
             // console.log(typeof lang)
             function fixLabel(label) {
@@ -441,32 +500,9 @@
     }
 </script>
 <script>
-    $("#apikeyactive").change(function () {
-        eel.updateSetting($(this).attr("id"), $(this).val())
-        // alert($(this).val());
-    });
 
-    function kichHoatTaiKhoan() {
-        var apikeyActive = getValue("#apikeyactive")
-        eel.kichHoatTaiKhoan(apikeyActive)(function (callback) {
-            var mess = callback.mess
-            toastWarning(mess)
-            // if (mess != "success") {
-            //     setHtmlCssSelector("#saveSettingStatus", `<div class="w3-panel w3-pale-red w3-bottombar w3-border-red w3-border">
-            //         <h3>Kích hoạt tài khoản thất bại</h3>
-            //         <p>${mess}</p>
-            //     </div>`  )
-            //     return
-            // }
-            // var result = callback.result
-            // setHtmlCssSelector("#saveSettingStatus", `<div class="w3-panel w3-pale-green w3-bottombar w3-border-green w3-border">
-            //         <h3>Kích hoạt tài khoản thành công</h3>
-            //         <p>${result}</p>
-            //     </div>`)
-            console.log(callback)
-        }
-        )
-    }
+
+
     function getKeyInfo() {
         eel.getKeyInfo()(function (callback) {
             data = callback.data
@@ -476,7 +512,13 @@
             keyactive = data.serial
 
             // $("#serial").val("Key: " + keyactive)
-            $("#user").val("Hi " + hoten + ". " + "Expiration date: " + date + ". " + "Hwid: " + hwid)
+            if (hoten == undefined) {
+                setHtmlCssSelector("#user", "Tài khoản chưa được kích hoạt")
+                $("#user").css("color", "red")
+                return
+            }
+            setHtmlCssSelector("#user", "Hi: " + hoten + ". " + "Expired: " + date)
+            $("#user").css("color", "green")
 
             // console.log(date)
             // console.log(hoten)
@@ -510,69 +552,11 @@
     $("#checkpause").bind("click", function () {
         eel.setPause(this.checked)()
     });
-    function pagination(c, m) {
-        var current = c,
-            last = m,
-            delta = 2,
-            left = current - delta,
-            right = current + delta + 1,
-            range = [],
-            rangeWithDots = [],
-            l;
-
-        for (let i = 1; i <= last; i++) {
-            if (i == 1 || i == last || (i >= left && i < right)) {
-                range.push(i);
-            }
-        }
-
-        for (let i of range) {
-            if (l) {
-                if (i - l === 2) {
-                    rangeWithDots.push(l + 1);
-                } else if (i - l !== 1) {
-                    rangeWithDots.push("...");
-                }
-            }
-            rangeWithDots.push(i);
-            l = i;
-        }
-        return rangeWithDots;
-    }
-    function generateHTML(currentPage, totalPages) {
-        currentPage = parseInt(currentPage);
-        var html = '<ul class="page">';
-        html +=
-            '<li class="page__btn" id="back_page"><span class="material-icons">chevron_left</span></li>';
-
-        var paginationArray = pagination(currentPage, totalPages);
-        for (var i = 0; i < paginationArray.length; i++) {
-            var pageNumber = paginationArray[i];
-            if (pageNumber === "...") {
-                html += '<li class="page__dots">...</li>';
-            } else {
-                html += '<li class="page__numbers">' + pageNumber + "</li>";
-            }
-        }
-
-        html +=
-            '<li class="page__btn" id="next_page"><span class="material-icons">chevron_right</span></li>';
-        html += "</ul>";
-
-        return html;
-    }
 
 
-    function showSelected() {
-        var text = "Selected"
-        var langselect = localStorage.getItem("lang")
-        if (langselect == "vi") {
-            text = "Đã chọn"
-        }
 
-        setHtmlCssSelector("#selected", text + ": " + selected.length)
 
-    }
+
 
     eel.getVersion()(function (callback) {
         setHtmlCssSelector("#version", "Current version: " + callback)
