@@ -381,5 +381,3 @@ function showDialog(options = {}) {
         document.body.appendChild(overlay);
     });
 }
-
-// Sử dụng hàm showDialog
