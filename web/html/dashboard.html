@@ -108,7 +108,7 @@
 
     <div class="khoangcach">
 
-        <button class="btn" id="import" title="Thêm email"><i class="fa fa-upload"></i></i></button>
+        <button class="btn" id="tab_input" title="Thêm email"><i class="fa fa-upload"></i></i></button>
         <button class="btn" id="play" title="Chạy"><i class="fa fa-play"></i></button>
 
 
@@ -240,8 +240,8 @@
     $('#reload').bind('click', function () {
         updateMails(1)
     })
-    $('#import').bind('click', function () {
-        eel.openFile("import.txt")
+    $('#tab_input').bind('click', function () {
+        eel.openFolder("data/input/")
 
     })
     $('#tab_folder').bind('click', function () {
